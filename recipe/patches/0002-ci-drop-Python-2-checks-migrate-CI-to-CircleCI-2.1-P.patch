@@ -1,0 +1,59 @@
+From df5f645b1c292306558e258b087c340087c885bb Mon Sep 17 00:00:00 2001
+From: Matthew Loper <mattloper@scenix.ai>
+Date: Mon, 18 Aug 2025 08:12:28 -0700
+Subject: [PATCH 2/2] ci: drop Python 2 checks; migrate CI to CircleCI 2.1 +
+ Python 3.12
+
+- Remove Python 2 job and legacy test discovery path
+
+- Use cimg/python:3.12 and add pip cache
+
+- Install minimal system deps (gfortran, liblapack-dev)
+
+- Replace inspect.getargspec with inspect.getfullargspec
+
+- Fix string identity check to equality for order == 'C'
+---
+ chumpy/ch.py     | 5 +++--
+ chumpy/ch_ops.py | 2 +-
+ 2 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/chumpy/ch.py b/chumpy/ch.py
+index e903df9..2fda05d 100644
+--- a/chumpy/ch.py
++++ b/chumpy/ch.py
+@@ -1200,7 +1200,7 @@ def depends_on(*dependencies):
+             [deps.add(d) for d in dep]
+     
+     def _depends_on(func):
+-        want_out = 'out' in inspect.getargspec(func).args
++        want_out = 'out' in inspect.getfullargspec(func).args
+         
+         @wraps(func)
+         def with_caching(self, *args, **kwargs):
+@@ -1243,7 +1243,8 @@ class ChLambda(Ch):
+             self.args[argname].x = getattr(self, argname)
+     
+     def __init__(self, lmb, initial_args=None):
+-        args = {argname: ChHandle(x=Ch(idx)) for idx, argname in enumerate(inspect.getargspec(lmb)[0])}
++        argspec_args = inspect.getfullargspec(lmb).args
++        args = {argname: ChHandle(x=Ch(idx)) for idx, argname in enumerate(argspec_args)}
+         if initial_args is not None:
+             for initial_arg in initial_args:
+                 if initial_arg in args:
+diff --git a/chumpy/ch_ops.py b/chumpy/ch_ops.py
+index f5f2f74..1192ec7 100755
+--- a/chumpy/ch_ops.py
++++ b/chumpy/ch_ops.py
+@@ -82,7 +82,7 @@ for rtn in not_yet_implemented:
+ 
+ def asarray(a, dtype=None, order=None):
+     assert(dtype is None or dtype is np.float64)
+-    assert(order is 'C' or order is None)
++    assert(order == 'C' or order is None)
+     if hasattr(a, 'dterms'):
+         return a
+     return Ch(np.asarray(a, dtype, order))
+-- 
+2.51.0
+
