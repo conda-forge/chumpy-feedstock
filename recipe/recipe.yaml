@@ -1,0 +1,64 @@
+schema_version: 1
+
+context:
+  name: chumpy
+  version: "0.70"
+  python_min: "3.10"
+
+package:
+  name: ${{ name|lower }}
+  version: ${{ version }}
+
+source:
+  url: https://pypi.org/packages/source/c/chumpy/chumpy-${{ version }}.tar.gz
+  sha256: a0275c2018784ca1302875567dc81761f5fd469fab9f3ac0f3e7c39e9180350a
+  patches:
+    - patches/0001-Delete-unused-and-deprecated-import.patch
+    - patches/0002-ci-drop-Python-2-checks-migrate-CI-to-CircleCI-2.1-P.patch
+
+build:
+  number: 2
+  noarch: python
+  script: ${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+
+requirements:
+  host:
+    - pip
+    - python ${{ python_min }}.*
+    - setuptools
+  run:
+    - python >=${{ python_min }}
+    - numpy
+    - scipy
+    - six
+
+tests:
+  - python:
+      imports:
+        - chumpy
+      pip_check: true
+      python_version: ${{ python_min }}.*
+  - script:
+      - python run_test.py
+    files:
+      recipe:
+        - run_test.py
+    requirements:
+      run:
+        - python ${{ python_min }}.*
+
+about:
+  homepage: https://github.com/mattloper/chumpy
+  repository: https://github.com/mattloper/chumpy
+  summary: chumpy is a Python-based framework designed to handle the auto-differentiation problem
+  description: |
+    chumpy is a Python-based framework designed to handle the auto-differentiation
+    problem. It is intended to be fast, flexible, and easy to use. It was originally
+    developed as part of the SMPL human body model project, but has since been
+    extracted into a separate package.
+  license: MIT
+  license_file: LICENSE.txt
+
+extra:
+  recipe-maintainers:
+    - jeongseok-meta
