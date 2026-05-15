@@ -1,0 +1,23 @@
+From 9e3a9cc86da22b99d0a62bd5df3c1c22094fed69 Mon Sep 17 00:00:00 2001
+From: jeongseok-meta <142548112+jeongseok-meta@users.noreply.github.com>
+Date: Thu, 14 May 2026 17:08:00 -0700
+Subject: [PATCH] Fix api_compatibility main global statement
+
+---
+ chumpy/api_compatibility.py | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/chumpy/api_compatibility.py b/chumpy/api_compatibility.py
+index 54f6d85..7737d2a 100644
+--- a/chumpy/api_compatibility.py
++++ b/chumpy/api_compatibility.py
+@@ -529,6 +529,5 @@ def main():
+ 
+ 
+ if __name__ == '__main__':
+-    global which_passed
+     main()
+     print(' '.join(which_passed))
+-- 
+2.51.0
+
